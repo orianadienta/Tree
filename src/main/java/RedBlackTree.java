@@ -5,19 +5,12 @@ public class RedBlackTree {
         Node right;
         Node parent;
         boolean red;
-        boolean isLeaf;
-
-        public Node() {
-            this.red = false; // leaf selalu hitam
-            this.isLeaf = true;
-        }
 
         public Node(char key) {
             this.key = key;
-            this.red = true; // node baru selalu merah
-            this.isLeaf = false;
-            this.left = new Node();
-            this.right = new Node();
+            this.left = null;
+            this.right = null;
+            this.red = true;
         }
 
         public char getKey() {
@@ -55,20 +48,18 @@ public class RedBlackTree {
         public void setRed(boolean red) {
             this.red = red;
         }
-
-        public boolean isLeaf() {
-            return isLeaf;
-        }
     }
 
     public class Tree {
         Node root;
-        Node leaf;
+        final Node TNULL;
 
         public Tree() {
-            leaf= new Node();
-            leaf.setRed(false);
-            this.root = leaf;
+            TNULL = new Node('\0');
+            TNULL.setRed(false);
+            TNULL.setLeft(null);
+            TNULL.setRight(null);
+            this.root = TNULL;
         }
 
         public boolean isExist(char key) {
@@ -76,13 +67,13 @@ public class RedBlackTree {
         }
 
         public boolean isExistHelper(Node node, char key) {
-            if (node.isLeaf()) {
+            if (node == TNULL) {
                 return false;
             }
             if (key == node.getKey()) {
                 return true;
             } else if (key < node.getKey()) {
-                return isExistHelper(node.getLeft(), key);
+                return isExistHelper(node.getLeft(), key); // panggil method isExist
             } else {
                 return isExistHelper(node.getRight(), key);
             }
@@ -93,16 +84,18 @@ public class RedBlackTree {
                 return false;
             }
             Node newNode = new Node(key);
+            newNode.setLeft(TNULL);
+            newNode.setRight(TNULL);
             newNode.setRed(true);
 
-            if (root.isLeaf()) {
+            if (root == TNULL) {
                 root = newNode;
                 root.setRed(false);
-                root.setParent(leaf);
+                root.setParent(TNULL);  // Set parent to TNULL to prevent null issues
             } else {
                 Node node = root;
-                Node parent = leaf;
-                while (!node.isLeaf()) {
+                Node parent = null;
+                while (node != TNULL) {
                     parent = node;
                     if (key < node.getKey()) {
                         node = node.getLeft();
@@ -122,7 +115,7 @@ public class RedBlackTree {
         }
 
         private void fixAdd(Node node) {
-            while (node.getParent().isRed()) {
+            while (node.getParent() != TNULL && node.getParent().isRed()) {
                 if (node.getParent() == node.getParent().getParent().getLeft()) {
                     Node uncle = node.getParent().getParent().getRight();
                     if (uncle.isRed()) {
@@ -156,24 +149,21 @@ public class RedBlackTree {
                         rotateToLeft(node.getParent().getParent());
                     }
                 }
-                if (node == root) {
-                    break;
-                }
             }
-            root.setRed(false);
+            root.setRed(false); // Root is always black
         }
 
         public void rotateToLeft(Node node) {
             Node rightChild = node.getRight();
             node.setRight(rightChild.getLeft());
 
-            if (!rightChild.getLeft().isLeaf()) {
+            if (rightChild.getLeft() != TNULL) {
                 rightChild.getLeft().setParent(node);
             }
 
             rightChild.setParent(node.getParent());
 
-            if (node.getParent().isLeaf()) {
+            if (node.getParent() == TNULL) {
                 root = rightChild;
             } else if (node == node.getParent().getLeft()) {
                 node.getParent().setLeft(rightChild);
@@ -188,12 +178,12 @@ public class RedBlackTree {
             Node leftChild = node.getLeft();
             node.setLeft(leftChild.getRight());
 
-            if (!leftChild.getRight().isLeaf()) {
+            if (leftChild.getRight() != TNULL) {
                 leftChild.getRight().setParent(node);
             }
             leftChild.setParent(node.getParent());
 
-            if (node.getParent().isLeaf()) {
+            if (node.getParent() == TNULL) {
                 root = leftChild;
             } else if (node == node.getParent().getRight()) {
                 node.getParent().setRight(leftChild);
@@ -204,9 +194,8 @@ public class RedBlackTree {
             node.setParent(leftChild);
         }
 
-        // Metode traversal dan print
         public void preOrderTransversal(Node node) {
-            if (!node.isLeaf()) {
+            if (node != TNULL) {
                 System.out.print(node.getKey() + " ");
                 preOrderTransversal(node.getLeft());
                 preOrderTransversal(node.getRight());
@@ -214,7 +203,7 @@ public class RedBlackTree {
         }
 
         public void inOrderTransversal(Node node) {
-            if (!node.isLeaf()) {
+            if (node != TNULL) {
                 inOrderTransversal(node.getLeft());
                 System.out.print(node.getKey() + " ");
                 inOrderTransversal(node.getRight());
@@ -222,7 +211,7 @@ public class RedBlackTree {
         }
 
         public void postOrderTransversal(Node node) {
-            if (!node.isLeaf()) {
+            if (node != TNULL) {
                 postOrderTransversal(node.getLeft());
                 postOrderTransversal(node.getRight());
                 System.out.print(node.getKey() + " ");
@@ -230,7 +219,7 @@ public class RedBlackTree {
         }
 
         public void printTree(Node node, int space) {
-            if (node.isLeaf()) return;
+            if (node == TNULL) return;
             space += 4;
             printTree(node.getRight(), space);
             System.out.println();
@@ -250,17 +239,17 @@ public class RedBlackTree {
         RedBlackTree redBlackTree = new RedBlackTree();
         Tree tree = redBlackTree.new Tree();
 
+        tree.add('G');
+        tree.add('J');
+        tree.add('S');
+        tree.add('D');
+        tree.add('K');
         tree.add('C');
         tree.add('A');
-        tree.add('D');
         tree.add('F');
         tree.add('B');
-        tree.add('E');
-        tree.add('G');
-        tree.add('I');
-        tree.add('H');
-        tree.add('J');
-        tree.add('J');
+        tree.add('N');
+        tree.add('N');
 
         System.out.println("Visualisasi Tree: ");
         tree.printTree(tree.root, 0);
