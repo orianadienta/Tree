@@ -97,9 +97,9 @@ public class BinarySearchTree {
                 } else if (node.getRight() == null) {
                     return node.getLeft();
                 }
-                char successorKey = minValue(node.getRight());
+                char successorKey = minValue(node.getLeft());
                 node.key = successorKey;
-                node.setRight(removeHelper(node.getRight(), successorKey));
+                node.setLeft(removeHelper(node.getLeft(), successorKey));
             }
             return node;
         }
@@ -167,51 +167,69 @@ public class BinarySearchTree {
     public static void main(String[] args) {
         BinarySearchTree binarySearchTree = new BinarySearchTree();
         Tree tree = binarySearchTree.new Tree();
+        Scanner scanner = new Scanner(System.in);
+        int choice;
 
-        tree.add('S');
-        tree.add('E');
-        tree.add('K');
-        tree.add('O');
-        tree.add('L');
-        tree.add('A');
-        tree.add('H');
-
-        System.out.println("Visualisasi Tree: ");
-        tree.printTree(tree.root, 0);
-
-        System.out.println("Pre order: ");
-        tree.preOrderTransversal(tree.root);
-        System.out.println();
-
-        System.out.println("In order: ");
-        tree.inOrderTransversal(tree.root);
-        System.out.println();
-
-        System.out.println("Post order: ");
-        tree.postOrderTransversal(tree.root);
-        System.out.println();
-
-        char searchKey = 'O';
-        System.out.println("\nApakah " + searchKey + " ada di dalam tree? " + tree.isExist(searchKey));
-        System.out.println();
-
-        char removeKey = 'S';
-
-        boolean isRemoved = tree.remove(removeKey);
-        if (isRemoved) {
-            System.out.println("key " + removeKey + " berhasil dihapus");
-        } else {
-            System.out.println("key " + removeKey + " tidak ditemukan");
+        char[] initialValues = {'G', 'J', 'S', 'D', 'K', 'C', 'A', 'F', 'B', 'N'};
+        for (char value : initialValues) {
+            tree.add(value);
         }
 
-        System.out.println("\nHasil akhir tree");
-        tree.printTree(tree.root, 0);
+        do {
+            System.out.println("\nMenu:");
+            System.out.println("1. Insert key");
+            System.out.println("2. Remove key");
+            System.out.println("3. Find key");
+            System.out.println("4. Tree visualization");
+            System.out.println("5. Print traversals");
+            System.out.println("6. Height of tree");
+            System.out.println("0. Close program");
+            System.out.print("Choose an option: ");
+            choice = scanner.nextInt();
+            scanner.nextLine(); // Consume newline character
 
-        // Tampilan tree setelah penghapusan elemenn
-        System.out.println("\nTree setelah menghapus key :");
-        tree.inOrderTransversal(tree.root);
+            switch (choice) {
+                case 1:
+                    System.out.print("Enter key to insert: ");
+                    char insertKey = scanner.nextLine().charAt(0);
+                    tree.add(insertKey);
+                    break;
+                case 2:
+                    System.out.print("Enter key to remove: ");
+                    char removeKey = scanner.nextLine().charAt(0);
+                    if (tree.remove(removeKey)) System.out.println("Key " + removeKey + " removed.");
+                    else System.out.println("Key " + removeKey + " not found.");
+                    break;
+                case 3:
+                    System.out.print("Enter key to find: ");
+                    char findKey = scanner.nextLine().charAt(0);
+                    System.out.println("Key " + findKey + " exists: " + tree.isExist(findKey));
+                    break;
+                case 4:
+                    System.out.println("Tree visualization:");
+                    tree.printTree(tree.root, 0);
+                    break;
+                case 5:
+                    System.out.println("Pre-order traversal:");
+                    tree.preOrderTransversal(tree.root);
+                    System.out.println("\nIn-order traversal:");
+                    tree.inOrderTransversal(tree.root);
+                    System.out.println("\nPost-order traversal:");
+                    tree.postOrderTransversal(tree.root);
+                    System.out.println();
+                    break;
+                case 6:
+                    System.out.println("Height of tree: " + tree.height(tree.root));
+                    break;
+                case 0:
+                    System.out.println("Closing program.");
+                    break;
+                default:
+                    System.out.println("Invalid option. Try again.");
+            }
+        } while (choice != 0);
 
-        System.out.println("\nTinggi dari BST adalah: " + tree.height(tree.root));
+        scanner.close();
     }
 }
 
